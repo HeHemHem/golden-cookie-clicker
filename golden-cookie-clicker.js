@@ -1,34 +1,40 @@
-// ==/UserScript==
+"use strict";
 
-/* global Game:false, GM_info:false */
-function executeAutoActions() {
-  if (Game.T % (Game.fps * 0.5) !== 0) {
-    // Game logic ticks very fast, only trigger every 0.5s
-    return;
-  }
+if (typeof Game !== "object" || Game === null || !Array.isArray(Game.shimmers)) {
 
-  // Click all golden cookies
-  Game.shimmers.forEach(obj => obj.pop());
+	console.error(
+		"Golden Cookie Clicker: Cookie Clicker API is not ready or invalid.\n" +
+		"Please make sure you are running this script on a Cookie Clicker webpage, " +
+		"and the page is fully loaded."
+	);
 
-  // Harvest sugar lumps
-  if ((new Date() - Game.lumpT) > Game.lumpRipeAge) {
-    Game.harvestLumps(1);
-  }
-  
-function installHelper() {
-  // Startup notification
-  let version = GM_info.script.version;
-  note(`Version ${version} loaded.`);
+} else if (typeof Proxy !== "function") {
 
-  // Do not click toggle upgrades
-  blockingUpgrades = blockingUpgrades.concat(Game.UpgradesByPool['toggle'].map(obj => obj.id));
+	console.error(
+		"Golden Cookie Clicker: JavaScript Proxy API is not available, " +
+		"either update your browser, or use the ES3 compatible version:\n"+
+		"https://rainslide.neocities.org/cookieclicker/GoldenCookieClicker.es3.js"
+	);
 
-  Game.customLogic.push(executeAutoActions);
+} else {
+
+	const apply = (target, _this, args) => {
+		var shimmer = args[0];
+		if ((shimmer.type === "golden" && !shimmer.wrath) || shimmer.type === "reindeer" || shimmer.wrath) {
+			setTimeout(() => shimmer.pop(), 500);
+		}
+		return Reflect.apply(target, _this, args);
+	};
+
+	Object.defineProperty(Game.shimmers, "push", {
+		value: new Proxy(Game.shimmers.push, { apply }),
+		writable: true,
+		enumerable: false,
+		configurable: true
+	});
+
+	typeof Game.Win === "function" &&
+	Game.Win("Third-party");
+
+
 }
-
-function note(msg, quick = true) {
-  // Icon: img/icons.png 0-based indices
-  Game.Notify('Auto-CookieClicker', msg, [12, 0], quick, true);
-}
-
-(() => window.setTimeout(installHelper, 1000))();
