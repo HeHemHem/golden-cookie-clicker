@@ -28,7 +28,7 @@ if (typeof Game !== "object" || Game === null || !Array.isArray(Game.shimmers)) 
 
 	const apply = (target, _this, args) => {
 		var shimmer = args[0];
-		if (shimmer.type === "golden" || shimmer.type === "reindeer") {
+		if (shimmer.type === "Wrath cookie" || shimmer.type === "reindeer") {
 			setTimeout(() => shimmer.pop(), 500);
 		}
 		return Reflect.apply(target, _this, args);
