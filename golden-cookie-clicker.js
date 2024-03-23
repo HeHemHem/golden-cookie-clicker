@@ -1,7 +1,6 @@
 setInterval(function() {
-
-Game.shimmers.forEach(function(shimmer) {
-if (shimmer.type == "golden") { shimmer.pop() }
-})
-
-}, 500);
+  Game.shimmers.forEach(function(shimmer) {
+    shimmer.pop()
+  })
+}, 
+500);
